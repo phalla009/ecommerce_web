@@ -1,98 +1,60 @@
-# 🛒 E-Commerce System
+# 🛒 Flask E-Commerce System
 
-A modern, full-stack e-commerce solution designed for seamless shopping experiences and efficient store management.
+A robust, full-stack E-commerce backend solution built with Python and the Flask web framework. This system provides a complete RESTful API for managing products, user accounts, shopping carts, and secure payment processing.
 
 ---
 
-## 🚀 Key Features
+## 🌟 Features
 
-* **User Authentication:** Secure login and registration with session management.
-* **Product Catalog:** Dynamic browsing with category filtering and search capabilities.
-* **Shopping Cart:** Real-time cart updates, persistent storage, and quantity adjustment.
-* **Checkout & Payments:** Secure payment processing integration (e.g., Stripe/PayPal).
-* **Admin Dashboard:** Manage products, track inventory, and view order analytics.
-* **Order History:** User-specific tracking of past purchases and shipping status.
-* **Responsive Design:** Fully optimized for mobile, tablet, and desktop views.
+### 👤 Customer Experience
+* **Secure Auth:** User registration and login powered by **Flask-JWT-Extended**.
+* **Product Discovery:** Browse, search, and filter products by category.
+* **Shopping Cart:** Add, remove, and update item quantities with persistent storage.
+* **Seamless Checkout:** Integrated with **Stripe API** for secure credit card transactions.
+* **Order History:** Users can track their previous purchases and order status.
+
+### 🛠 Administrative Tools
+* **Inventory Control:** Full CRUD (Create, Read, Update, Delete) operations for products.
+* **Order Management:** Dashboard to view all customer transactions and shipping status.
+* **Access Control:** Role-based permissions (User vs. Admin) to protect sensitive endpoints.
+
+---
 
 ## 🛠 Tech Stack
 
-| Layer          | Technology                          |
-| :------------- | :---------------------------------- |
-| **Frontend** | React.js / Next.js / Tailwind CSS   |
-| **Backend** | Node.js / Express / Python          |
-| **Database** | MongoDB / PostgreSQL                |
-| **Auth** | JWT / Auth0                         |
-| **Payments** | Stripe API                          |
+| Component      | Technology                                    |
+| :------------- | :-------------------------------------------- |
+| **Framework** | [Flask](https://flask.palletsprojects.com/)   |
+| **Database** | PostgreSQL (Prod) / SQLite (Dev)             |
+| **ORM** | [Flask-SQLAlchemy](https://flask-sqlalchemy.palletsprojects.com/) |
+| **Migrations** | [Flask-Migrate](https://flask-migrate.readthedocs.io/) |
+| **Security** | JWT (JSON Web Tokens) & Passlib (Bcrypt)      |
+| **Payments** | [Stripe SDK](https://stripe.com/docs/api)     |
+| **Validation** | Marshmallow                                   |
 
 ---
 
-## 📦 Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
+### 1. Prerequisites
+* Python 3.9+
+* Pip (Python Package Manager)
+* Stripe API Keys (Sign up at [Stripe.com](https://stripe.com))
 
-Before you begin, ensure you have the following installed:
-* **Node.js** (v18.x or higher)
-* **npm** or **yarn**
-* **Git**
+### 2. Installation
+```bash
+# Clone the repository
+git clone [https://github.com/yourusername/flask-ecommerce.git](https://github.com/yourusername/flask-ecommerce.git)
+cd flask-ecommerce
 
-### Installation & Setup
+# Create a virtual environment
+python -m venv venv
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
-    cd your-repo-name
-    ```
+# Activate the environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
 
-2.  **Install Dependencies:**
-    ```bash
-    # Install backend dependencies
-    cd server
-    npm install
-
-    # Install frontend dependencies
-    cd ../client
-    npm install
-    ```
-
-3.  **Environment Configuration:**
-    Create a `.env` file in the `server` directory and add your credentials:
-    ```env
-    PORT=5000
-    MONGO_URI=your_mongodb_connection_string
-    JWT_SECRET=your_jwt_secret
-    STRIPE_SECRET_KEY=your_stripe_key
-    ```
-
-4.  **Run the Application:**
-    ```bash
-    # Start the backend (from /server)
-    npm run dev
-
-    # Start the frontend (from /client)
-    npm start
-    ```
-
----
-
-## 🛣 API Endpoints (Quick Reference)
-
-| Method | Endpoint             | Description              |
-| :----- | :------------------- | :----------------------- |
-| GET    | `/api/products`      | Fetch all products       |
-| POST   | `/api/users/login`   | Authenticate user        |
-| POST   | `/api/orders`        | Create a new order       |
-| PUT    | `/api/admin/product` | Update product inventory |
-
----
-
-## 🤝 Contributing
-
-1.  Fork the Project
-2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the Branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+# Install dependencies
+pip install -r requirements.txt
