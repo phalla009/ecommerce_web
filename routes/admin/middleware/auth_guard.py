@@ -1,4 +1,3 @@
-
 from functools import wraps
 from flask_jwt_extended import verify_jwt_in_request, get_jwt
 from flask import jsonify
@@ -9,6 +8,6 @@ def admin_required(fn):
         verify_jwt_in_request()
         claims = get_jwt()
         if claims.get("role") != "admin":
-            return jsonify({"message": "Admin access required"}), 403
+            return jsonify({"message": "Admin access middleware"}), 403
         return fn(*args, **kwargs)
     return wrapper

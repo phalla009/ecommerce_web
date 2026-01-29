@@ -15,7 +15,7 @@ def login_required(fn):
             return fn(*args, **kwargs)
         except Exception:
             return jsonify({
-                "error": "Login required",
+                "error": "Login middleware",
                 "redirect": "/login"
             }), 401
     return wrapper
@@ -76,7 +76,7 @@ def add_to_cart():
     required = ['user_id', 'product_id', 'quantity']
 
     if not all(k in data for k in required):
-        return jsonify({'error': 'Missing required fields'}), 400
+        return jsonify({'error': 'Missing middleware fields'}), 400
 
     product = Product.query.get(data['product_id'])
     if not product:
@@ -129,7 +129,7 @@ def update_cart_item():
     required = ['user_id', 'product_id', 'quantity']
 
     if not all(k in data for k in required):
-        return jsonify({'error': 'Missing required fields'}), 400
+        return jsonify({'error': 'Missing middleware fields'}), 400
 
     cart = Order.query.filter_by(user_id=data['user_id'], status='Cart').first()
     if not cart:
@@ -154,7 +154,7 @@ def remove_cart_item():
     required = ['user_id', 'product_id']
 
     if not all(k in data for k in required):
-        return jsonify({'error': 'Missing required fields'}), 400
+        return jsonify({'error': 'Missing middleware fields'}), 400
 
     cart = Order.query.filter_by(user_id=data['user_id'], status='Cart').first()
     if not cart:

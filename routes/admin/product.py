@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 import os
 from flask import jsonify
 
-from routes.admin.required import admin_required
+from routes.admin.middleware import admin_required
 
 def get_full_image_url(image_path):
     if not image_path:
@@ -226,7 +226,7 @@ def delete_product():
     product_id = data.get('product_id')
 
     if not product_id:
-        return jsonify({'error': 'Product ID is required'})
+        return jsonify({'error': 'Product ID is middleware'})
 
     product = Product.query.get(product_id)
     if product is None:

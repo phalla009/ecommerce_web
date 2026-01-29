@@ -15,7 +15,7 @@ def login_required(fn):
             return fn(*args, **kwargs)
         except Exception:
             return jsonify({
-                "error": "Login required",
+                "error": "Login middleware",
                 "redirect": "/login"
             })
     return wrapper
@@ -64,7 +64,7 @@ def create_order():
     required = ['user_id', 'total_amount', 'payment_method', 'shipping_address']
 
     if not all(k in data for k in required):
-        return jsonify({'error': 'Missing required fields'}), 400
+        return jsonify({'error': 'Missing middleware fields'}), 400
 
     try:
         sql = text("""
@@ -98,7 +98,7 @@ def update_order_status():
     new_status = data.get('status')
 
     if not order_id or not new_status:
-        return jsonify({'error': 'order_id and status are required'}), 400
+        return jsonify({'error': 'order_id and status are middleware'}), 400
 
     sql = text('UPDATE "order" SET status = :status WHERE id = :id')
     db.session.execute(sql, {'status': new_status, 'id': order_id})

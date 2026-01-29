@@ -4,7 +4,7 @@ from app import app, db
 from flask import jsonify, request
 from sqlalchemy import text
 from model import Category
-from routes.admin.required import admin_required
+from routes.admin.middleware import admin_required
 
 
 @app.get('/api/category')
@@ -76,7 +76,7 @@ def update_category():
     if not category_id:
         return jsonify(
             {
-                'error': 'Category ID is required'
+                'error': 'Category ID is middleware'
             }
         )
     category = Category.query.get(category_id)
@@ -112,7 +112,7 @@ def delete_category():
     data = request.get_json()
     category_id = data.get('category_id')
     if not category_id:
-        return jsonify({'error': 'Category ID is required'})
+        return jsonify({'error': 'Category ID is middleware'})
     category = Category.query.get_or_404(category_id)
     create_at = datetime.now()
     display_date = create_at.strftime("%d-%m-%Y")

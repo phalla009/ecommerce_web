@@ -12,7 +12,7 @@ def login_required(fn):
             return fn(*args, **kwargs)
         except Exception:
             return jsonify({
-                "error": "Login required",
+                "error": "Login middleware",
                 "redirect": "/login"
             }), 401
     return wrapper

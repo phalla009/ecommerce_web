@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from sqlalchemy import text
 from app import app, db
-from routes.admin.required import admin_required
+from routes.admin.middleware import admin_required
 
 @app.get('/api/admin/orders/dashboard')
 @admin_required
@@ -50,7 +50,7 @@ def admin_update_order_status(order_id):
     status = data.get('status')
 
     if not status:
-        return jsonify({'error': 'Status is required'}), 400
+        return jsonify({'error': 'Status is middleware'}), 400
 
     check_sql = text('SELECT id FROM "order" WHERE id = :id')
     order = db.session.execute(check_sql, {'id': order_id}).fetchone()

@@ -20,7 +20,7 @@ def register():
     role = "user"
 
     if not all([name, email, password]):
-        return jsonify({"msg": "Name, email, and password are required"}), 400
+        return jsonify({"msg": "Name, email, and password are middleware"}), 400
 
     if User.query.filter((User.name == name) | (User.email == email)).first():
         return jsonify({"msg": "User with this name or email already exists"}), 400
@@ -94,7 +94,7 @@ def reset_password():
     confirm_password = data.get("confirm_password") or ""
 
     if not all([old_password, new_password, confirm_password]):
-        return jsonify({"msg": "All password fields are required"}), 400
+        return jsonify({"msg": "All password fields are middleware"}), 400
 
     if new_password != confirm_password:
         return jsonify({"msg": "New passwords do not match"}), 400

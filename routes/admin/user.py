@@ -6,7 +6,7 @@ from app import app, db
 from model import User
 from flask import jsonify
 
-from routes.admin.required import admin_required
+from routes.admin.middleware import admin_required
 
 
 def is_valid_email(email):
@@ -79,7 +79,7 @@ def get_user_id(user_id: int):
 def create_user():
     data = request.get_json()
     if not data:
-        return jsonify({'error': 'Request body is required'})
+        return jsonify({'error': 'Request body is middleware'})
 
     name = data.get('name')
     password = data.get('password')
@@ -148,7 +148,7 @@ def update_user(id):
 def delete_user():
     data = request.get_json()
     if not data or 'user_id' not in data:
-        return jsonify({'error': 'user_id is required'})
+        return jsonify({'error': 'user_id is middleware'})
 
     user_id = data['user_id']
     user = User.query.get(user_id)
