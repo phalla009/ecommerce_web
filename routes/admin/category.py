@@ -112,21 +112,19 @@ def delete_category():
     data = request.get_json()
     category_id = data.get('category_id')
     if not category_id:
-        return jsonify({'error': 'Category ID is middleware'})
-    category = Category.query.get_or_404(category_id)
-    create_at = datetime.now()
-    display_date = create_at.strftime("%d-%m-%Y")
-    db.session.delete(category)
-    db.session.commit()
+        return jsonify({'error': 'Category ID is required'})
+    category = Category.query.get(category_id)
+    if not category:
+        return jsonify({'error': f'Category ID: {category_id} not found'}), 404
     category_info = {
         'id': category.id,
         'name': category.name,
         'active': "true",
-        'create_at': display_date,
-
+        'create_at': datetime.now().strftime("%d-%m-%Y"),
     }
+    db.session.delete(category)
+    db.session.commit()
     return jsonify({
         'message': 'Category deleted successfully',
         'Category': category_info
     })
-

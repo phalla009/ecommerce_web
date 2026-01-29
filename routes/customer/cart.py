@@ -147,7 +147,7 @@ def update_cart_item():
 
     db.session.commit()
     return jsonify({'message': 'Cart item updated'})
-@app.delete('/api/cart/remove')
+@app.delete('/api/cart/delete')
 @login_required
 def remove_cart_item():
     data = request.get_json()
