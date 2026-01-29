@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
@@ -20,7 +20,10 @@ import routes
 
 @app.route('/')
 def hello_world():
-    return 'Hello World!'
+    return jsonify({
+        "status": "ok",
+        "message": "API is running"
+    })
 
 if __name__ == '__main__':
     app.run(debug=True)
