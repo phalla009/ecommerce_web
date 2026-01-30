@@ -153,7 +153,7 @@ def create_products():
         }
     }
 
-@app.put('/api/admin/productS/update/<int:id>')
+@app.put('/api/admin/products/update/<int:id>')
 @admin_required
 def update_product(id):
     product = Product.query.get(id)
