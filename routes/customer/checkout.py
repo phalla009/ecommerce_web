@@ -106,20 +106,20 @@ def update_order_status():
 
     return jsonify({'message': f'Order {order_id} updated to {new_status}'})
 
-@app.delete('/api/checkout/delete')
-@login_required
-def delete_order():
-    data = request.get_json()
-    order_id = data.get('order_id')
-
-    order = Order.query.get(order_id)
-    if not order:
-        return jsonify({'error': f'Order id = {order_id} not found'})
-
-    db.session.execute(
-        text('DELETE FROM "order" WHERE id = :id'),
-        {'id': order_id}
-    )
-    db.session.commit()
-
-    return jsonify({'message': 'Order deleted successfully'})
+# @app.delete('/api/checkout/delete')
+# @login_required
+# def delete_order():
+#     data = request.get_json()
+#     order_id = data.get('order_id')
+#
+#     order = Order.query.get(order_id)
+#     if not order:
+#         return jsonify({'error': f'Order id = {order_id} not found'})
+#
+#     db.session.execute(
+#         text('DELETE FROM "order" WHERE id = :id'),
+#         {'id': order_id}
+#     )
+#     db.session.commit()
+#
+#     return jsonify({'message': 'Order deleted successfully'})
