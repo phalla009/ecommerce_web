@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard · Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .menu-toggle, .icon-btn, .search-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .menu-toggle svg, .icon-btn svg, .search-icon svg {
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Backdrop Overlay for Mobile Sidebar Drawer -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Toast Notification Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="shell">
+
+  <!-- Include Sidebar component -->
+  {% include 'admin/sidebar.html' %}
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <!-- Menu Toggle Icon -->
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <h1 class="page-title">Dashboard</h1>
+
+      <div class="topbar-right">
+        <div class="search-box">
+          <span class="search-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+          <input type="text" id="dashboardSearch" placeholder="Search orders, products…" />
+        </div>
+
+        <button class="icon-btn" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- STAT CARDS -->
+      <section class="stat-row">
+        <div class="stub">
+          <div class="stub-top"><span class="stub-label">Revenue today</span><span class="stub-tick"></span></div>
+          <div class="stub-value" id="statRevenue">$0.00</div>
+          <div class="stub-delta up" id="statRevenueDelta">--</div>
+        </div>
+        <div class="stub">
+          <div class="stub-top"><span class="stub-label">Orders today</span><span class="stub-tick"></span></div>
+          <div class="stub-value" id="statOrders">0</div>
+          <div class="stub-delta up" id="statOrdersDelta">--</div>
+        </div>
+        <div class="stub">
+          <div class="stub-top"><span class="stub-label">Products live</span><span class="stub-tick"></span></div>
+          <div class="stub-value" id="statProducts">0</div>
+          <div class="stub-delta muted" id="statStockDelta">--</div>
+        </div>
+        <div class="stub">
+          <div class="stub-top"><span class="stub-label">New customers</span><span class="stub-tick"></span></div>
+          <div class="stub-value" id="statCustomers">0</div>
+          <div class="stub-delta down" id="statCustomersDelta">--</div>
+        </div>
+      </section>
+
+      <!-- RECENT ORDERS TABLE -->
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Recent orders</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="ledger-table">
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="recentOrdersBody">
+              <tr>
+                <td colspan="6" style="text-align: center;" class="muted">Loading recent orders...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+</div>
+
+<script src="/static/js/main.js"></script>
+<script src="/static/js/dashboard.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+          window.location.href = '/admin/login';
+      }
+  });
+</script>
+</body>
+</html>

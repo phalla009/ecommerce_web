@@ -1,0 +1,105 @@
+<!-- ===== LOGOUT MODAL ===== -->
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal" style="max-width: 380px;">
+    <div class="modal-head">
+      <h3>Confirm Logout</h3>
+      <button class="modal-close" data-close="logoutModal" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="color: #334155; margin: 0;">Are you sure you want to log out from your account?</p>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-secondary" data-close="logoutModal">Cancel</button>
+      <button type="button" class="btn" id="confirmLogoutBtn" style="background-color: var(--red, #dc2626); color: white;">
+        <span>Yes, Log out</span>
+      </button>
+    </div>
+  </div>
+</div>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <img src="/static/image/logo/logo.png" alt="Ledger Logo" class="brand-logo" />
+    <span class="brand-name">KR SYSTEM<span class="brand-accent">.</span></span>
+  </div>
+
+  <nav class="nav">
+    <p class="nav-label">Overview</p>
+    <a href="/admin/dashboard" class="nav-item {% if active_page == 'dashboard' %}active{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="9"></rect>
+        <rect x="14" y="3" width="7" height="5"></rect>
+        <rect x="14" y="12" width="7" height="9"></rect>
+        <rect x="3" y="16" width="7" height="5"></rect>
+      </svg>
+      <span>Dashboard</span>
+    </a>
+
+    <p class="nav-label">Catalog</p>
+    <a href="/admin/catalogs/products" class="nav-item {% if active_page == 'products' %}active{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+      </svg>
+      <span>Products</span>
+    </a>
+
+    <a href="/admin/catalogs/category" class="nav-item {% if active_page == 'categories' %}active{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <span>Categories</span>
+    </a>
+
+    <p class="nav-label">Sales</p>
+    <a href="#" class="nav-item {% if active_page == 'orders' %}active{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+      </svg>
+      <span>Orders</span>
+    </a>
+
+    <p class="nav-label">People</p>
+    <a href="#" class="nav-item {% if active_page == 'customers' %}active{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+      </svg>
+      <span>Customers</span>
+    </a>
+
+    <a href="/admin/users" class="nav-item {% if active_page == 'users' %}active{% endif %}">
+      <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span>Users</span>
+    </a>
+
+    <p class="nav-label">Account</p>
+    <a href="#" id="logoutBtn" class="nav-item nav-item-muted">
+      <svg class="nav-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+      <span>Log out</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-foot">
+    <div class="user-chip">
+      <div class="user-avatar" id="userAvatar">A</div>
+      <div class="user-meta">
+        <span class="user-name" id="userName">Admin</span>
+        <span class="user-role" id="userRole">Administrator</span>
+      </div>
+    </div>
+  </div>
+</aside>
+<script src="/static/js/main.js"></script>

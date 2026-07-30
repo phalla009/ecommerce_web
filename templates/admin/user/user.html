@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Users · Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .btn, .btn-filter, .btn-icon, .search-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .btn svg, .btn-filter svg { flex-shrink: 0; }
+    .action-buttons { display: flex; align-items: center; gap: 0.5rem; }
+    .btn-icon {
+      padding: 0.4rem;
+      border-radius: 0.375rem;
+      border: 1px solid var(--border-color, #e2e8f0);
+      background: transparent;
+      color: currentColor;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-icon:hover { background-color: var(--hover-bg, #f1f5f9); }
+    .btn-icon.btn-edit:hover { color: var(--blue, #2563eb); border-color: #bfdbfe; }
+    .btn-icon.btn-delete:hover { color: var(--red, #dc2626); background-color: #fef2f2; border-color: #fca5a5; }
+    .user-avatar-placeholder {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #3b82f6;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .badge-role {
+      padding: 0.3rem 0.7rem;
+      border-radius: 24px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+    .badge-admin { background: #fee2e2; color: #991b1b; }
+    .badge-manager { background: #fef3c7; color: #92400e; }
+    .badge-sale { background: #e0f2fe; color: #075985; }
+  </style>
+</head>
+<body>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<div class="shell">
+  {% include 'admin/sidebar.html' %}
+
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-toggle" id="menuToggle" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <h1 class="page-title">Users</h1>
+      <div class="topbar-right">
+        <div class="search-box">
+          <span class="search-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          </span>
+          <input type="text" id="userSearchInput" placeholder="Search users..." />
+        </div>
+        <button class="btn btn-primary" id="openAddUserModalBtn">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+          <span>Add User</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+      <!-- Metric Cards -->
+      <section class="stat-row">
+        <div class="stub">
+          <div class="stub-top"><span class="stub-label">Total Users</span></div>
+          <div class="stub-value" id="statTotalUsers">0</div>
+        </div>
+        <div class="stub">
+          <div class="stub-top"><span class="stub-label">Admins</span></div>
+          <div class="stub-value" id="statAdmins">0</div>
+        </div>
+        <div class="stub">
+          <div class="stub-top"><span class="stub-label">Managers</span></div>
+          <div class="stub-value" id="statManagers">0</div>
+        </div>
+        <div class="stub">
+          <div class="stub-top"><span class="stub-label">Sales</span></div>
+          <div class="stub-value" id="statStandardUsers">0</div>
+        </div>
+      </section>
+
+      <!-- Users Table Panel -->
+      <section class="panel">
+        <div class="panel-head">
+          <h2>User Accounts</h2>
+          <div class="panel-actions">
+            <select id="roleFilter" class="btn-filter" style="padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid #e2e8f0;">
+              <option value="">All Roles</option>
+              <option value="admin">Admin</option>
+              <option value="manager">Manager</option>
+              <option value="sale">Sale</option>
+            </select>
+            <button class="btn-filter" id="refreshBtn">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+
+        <table class="ledger-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email Address</th>
+              <th>Created At</th>
+              <th>Role</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody">
+            <tr>
+              <td colspan="5" style="text-align: center;" class="muted">Loading users...</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- ===== USER DETAIL MODAL ===== -->
+<div class="modal-overlay" id="userDetailModal">
+  <div class="modal" style="max-width: 520px; width: 90%;">
+    <div class="modal-head">
+      <h3>User Profile</h3>
+      <button class="modal-close" data-close="userDetailModal" aria-label="Close modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display: flex; gap: 1.25rem; align-items: center; margin-bottom: 1.25rem;">
+        <div id="detailAvatar" class="user-avatar-placeholder" style="width: 64px; height: 64px; font-size: 1.5rem;">U</div>
+        <div style="flex: 1; min-width: 0;">
+          <h2 id="detailName" style="margin: 0; font-size: 1.2rem; font-weight: 600;">Full Name</h2>
+          <p id="detailEmail" style="color: #64748b; font-size: 0.875rem; margin: 2px 0 6px 0;">email@example.com</p>
+          <span id="detailRoleBadge" class="badge-role badge-sale">SALE</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); background: #f8fafc; padding: 0.85rem; border-radius: 8px; border: 1px solid #f1f5f9; text-align: center;">
+        <div>
+          <span style="font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">Created At</span>
+          <div id="detailCreatedAt" style="font-weight: 700; font-size: 0.95rem; color: #0f172a;" class="mono">N/A</div>
+        </div>
+        <div>
+          <span style="font-size: 0.7rem; color: #64748b; text-transform: uppercase; font-weight: 600; display: block; margin-bottom: 2px;">User ID</span>
+          <div id="detailUserId" style="font-weight: 700; font-size: 1.05rem; color: #0f172a;" class="mono">#0</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn btn-secondary" data-close="userDetailModal">Close</button>
+      <button type="button" class="btn btn-primary" id="detailEditBtn">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+        <span>Edit User</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADD USER MODAL ===== -->
+<div class="modal-overlay" id="addUserModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Add New User</h3>
+      <button class="modal-close" data-close="addUserModal" aria-label="Close modal">&times;</button>
+    </div>
+    <form id="addUserForm">
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="addName">Full Name</label>
+          <input type="text" id="addName" name="name" placeholder="John Doe" required>
+        </div>
+        <div class="form-group">
+          <label for="addEmail">Email Address</label>
+          <input type="email" id="addEmail" name="email" placeholder="example@mail.com" required>
+        </div>
+        <div class="form-group">
+          <label for="addPassword">Password</label>
+          <input type="password" id="addPassword" name="password" placeholder="••••••••" required>
+        </div>
+        <div class="form-group">
+          <label for="addRole">Role</label>
+          <select id="addRole" name="role" required>
+            <option value="sale" selected>Sale</option>
+            <option value="manager">Manager</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-secondary" data-close="addUserModal">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="saveUserBtn">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <span>Save User</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== EDIT USER MODAL ===== -->
+<div class="modal-overlay" id="editUserModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Edit User</h3>
+      <button class="modal-close" data-close="editUserModal" aria-label="Close modal">&times;</button>
+    </div>
+    <form id="editUserForm">
+      <div class="modal-body">
+        <input type="hidden" id="editUserId">
+        <div class="form-group">
+          <label for="editName">Full Name</label>
+          <input type="text" id="editName" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="editEmail">Email Address</label>
+          <input type="email" id="editEmail" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="editPassword">New Password <span class="muted" style="font-weight: normal; font-size: 0.8rem;">(Leave blank to keep unchanged)</span></label>
+          <input type="password" id="editPassword" name="password" placeholder="••••••••">
+        </div>
+        <div class="form-group">
+          <label for="editRole">Role</label>
+          <select id="editRole" name="role" required>
+            <option value="sale">Sale</option>
+            <option value="manager">Manager</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-secondary" data-close="editUserModal">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+          <span>Update User</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===== DELETE USER MODAL ===== -->
+<div class="modal-overlay" id="deleteUserModal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Delete User</h3>
+      <button class="modal-close" data-close="deleteUserModal" aria-label="Close modal">&times;</button>
+    </div>
+    <form id="deleteUserForm">
+      <div class="modal-body">
+        <input type="hidden" id="deleteUserId">
+        <p>Are you sure you want to delete <strong id="deleteUserName" style="color: var(--red, #dc2626);"></strong>?</p>
+        <p class="muted" style="font-size: 0.85rem; margin-top: 5px;">This action cannot be undone and will permanently remove the account.</p>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-secondary" data-close="deleteUserModal">Cancel</button>
+        <button type="submit" class="btn" style="background-color: var(--red, #dc2626); color: white;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+          <span>Yes, Delete</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="/static/js/main.js"></script>
+<script src="/static/js/user.js"></script>
+</body>
+</html>

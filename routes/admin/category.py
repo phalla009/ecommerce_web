@@ -1,130 +1,144 @@
 from datetime import datetime
-
-from app import app, db
 from flask import jsonify, request
 from sqlalchemy import text
+from app import app, db
 from model import Category
 from routes.admin.middleware import admin_required
 
 
+# 1. READ ALL CATEGORIES
 @app.get('/api/category')
-def get_category():
-    sql = text("SELECT id,  UPPER(SUBSTR(name, 1, 1)) || LOWER(SUBSTR(name, 2)) AS name, 'true' as active,create_at FROM category")
-    result = db.session.execute(sql).fetchall()
-    rows = [dict(row._mapping) for row in result]
-    if not rows:
-        return jsonify({'message': 'No category found'})
-    return jsonify(rows)
-
 @app.get('/api/category/list')
 def get_all_category():
-    sql = text("SELECT id,  UPPER(SUBSTR(name, 1, 1)) || LOWER(SUBSTR(name, 2)) AS name, 'true' as active,create_at FROM category")
-    result = db.session.execute(sql).fetchall()
-    rows = [dict(row._mapping) for row in result]
-    if not rows:
-        return jsonify({'message': 'No category found'})
-    return jsonify(rows)
+    try:
+        sql = text(
+            "SELECT id, UPPER(SUBSTR(name, 1, 1)) || LOWER(SUBSTR(name, 2)) AS name, "
+            "description, 'true' as active, create_at FROM category ORDER BY id DESC"
+        )
+        result = db.session.execute(sql).fetchall()
 
+        rows = []
+        for row in result:
+            item = dict(row._mapping)
+            if item.get('create_at') and isinstance(item['create_at'], datetime):
+                item['create_at'] = item['create_at'].strftime("%Y-%m-%d %H:%M:%S")
+            rows.append(item)
+
+        return jsonify(rows), 200
+    except Exception as e:
+        print("Database Error:", e)
+        return jsonify({'error': str(e)}), 500
+
+
+# 2. READ SINGLE CATEGORY
 @app.get('/api/category/list/<int:id>')
 def get_category_by_id(id):
     category = Category.query.get_or_404(id)
     return jsonify({
         'id': category.id,
         'name': category.name,
+        'description': category.description or '',
         'active': "true",
-        'create_at': category.create_at,
-    })
+        'create_at': category.create_at.strftime("%d-%m-%Y %H:%M") if category.create_at else None,
+    }), 200
 
 
+# HELPER FUNCTION
 def sql_fetch(category_id: int):
-    sql = text("SELECT id,  UPPER(SUBSTR(name, 1, 1)) || LOWER(SUBSTR(name, 2)) AS name, create_at FROM category WHERE id = :id")
+    sql = text(
+        "SELECT id, UPPER(SUBSTR(name, 1, 1)) || LOWER(SUBSTR(name, 2)) AS name, "
+        "description, create_at FROM category WHERE id = :id"
+    )
     result = db.session.execute(sql, {"id": category_id}).fetchone()
     if not result:
         return None
-    return dict(result._mapping)
+    item = dict(result._mapping)
+    if item.get('create_at') and isinstance(item['create_at'], datetime):
+        item['create_at'] = item['create_at'].strftime("%Y-%m-%d %H:%M:%S")
+    return item
 
+
+# 3. CREATE CATEGORY (POST)
 @app.post('/api/category/create')
 @admin_required
 def add_category():
-    data = request.get_json()
-    if 'name' not in data:
-        return jsonify({"error": "Missing key 'name'"})
-
-    if not data['name'].strip():
-        return jsonify({"error": "Name cannot be empty"})
+    data = request.get_json() or {}
+    if 'name' not in data or not data['name'].strip():
+        return jsonify({"error": "Category name is required"}), 400
 
     new_category = Category(
-        name=data['name'],
+        name=data['name'].strip(),
+        description=data.get('description', '').strip(),
         create_at=datetime.now(),
     )
     db.session.add(new_category)
     db.session.commit()
-    add_category = sql_fetch(new_category.id)
 
+    added_cat = sql_fetch(new_category.id)
 
     return jsonify({
-        'message': 'category added successfully',
-        'category': add_category
-    })
+        'message': 'Category added successfully',
+        'category': added_cat
+    }), 201
 
 
+# 4. UPDATE CATEGORY (PUT)
 @app.put('/api/category/update')
 @admin_required
 def update_category():
-    data = request.get_json()
+    data = request.get_json() or {}
     category_id = data.get('category_id')
     if not category_id:
-        return jsonify(
-            {
-                'error': 'Category ID is middleware'
-            }
-        )
-    category = Category.query.get(category_id)
+        return jsonify({'error': 'Category ID is required'}), 400
 
+    category = Category.query.get(category_id)
     if not category:
-        return jsonify({'error': 'Category not found'})
+        return jsonify({'error': 'Category not found'}), 404
 
     new_name = data.get('name')
-    if not new_name:
-        return jsonify({'error': "Missing key 'name' in request"})
-    create_at = datetime.now()
-    formatted_date = create_at.strftime("%Y-%m-%d")
-    display_date = create_at.strftime("%d-%m-%Y")
-    category.name = new_name
-    category.created_at = formatted_date
-    db.session.commit()
-    category_info = {
-        'id': category_id,
-        'name': category.name,
-        'active': "true",
-        'create_at': display_date,
+    if not new_name or not new_name.strip():
+        return jsonify({'error': "Category name cannot be empty"}), 400
 
+    category.name = new_name.strip()
+    category.description = data.get('description', '').strip()
+    db.session.commit()
+
+    category_info = {
+        'id': category.id,
+        'name': category.name,
+        'description': category.description,
+        'active': "true",
+        'create_at': category.create_at.strftime("%Y-%m-%d %H:%M:%S") if category.create_at else None,
     }
     return jsonify({
         'message': 'Category updated successfully',
         'category': category_info
-    })
+    }), 200
 
 
+# 5. DELETE CATEGORY (DELETE)
 @app.delete('/api/category/delete')
 @admin_required
 def delete_category():
-    data = request.get_json()
+    data = request.get_json() or {}
     category_id = data.get('category_id')
     if not category_id:
-        return jsonify({'error': 'Category ID is required'})
+        return jsonify({'error': 'Category ID is required'}), 400
+
     category = Category.query.get(category_id)
     if not category:
         return jsonify({'error': f'Category ID: {category_id} not found'}), 404
+
     category_info = {
         'id': category.id,
         'name': category.name,
-        'active': "true",
-        'create_at': datetime.now().strftime("%d-%m-%Y"),
+        'description': category.description,
     }
+
     db.session.delete(category)
     db.session.commit()
+
     return jsonify({
         'message': 'Category deleted successfully',
-        'Category': category_info
-    })
+        'category': category_info
+    }), 200
