@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: formData
             });
 
-            const textResponse = await res.text(); // អានជា Text មុនដើម្បីការពារ JSON Parse Error
+            const textResponse = await res.text();
             let result;
             try {
                 result = JSON.parse(textResponse);
@@ -368,7 +368,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ product_id: parseInt(id) })
             });
 
-            const result = await res.json();
+            const textResponse = await res.text();
+            let result;
+            try {
+                result = JSON.parse(textResponse);
+            } catch (err) {
+                console.error("Server HTML Error:", textResponse);
+                showToast('Server Error (500). Check terminal for Python traceback.', 'error');
+                return;
+            }
+
             if (res.status === 403) {
                 showToast('Access Denied: Admin role required.', 'error');
                 return;

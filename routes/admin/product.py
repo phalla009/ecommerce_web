@@ -289,34 +289,47 @@ def update_product(id):
         traceback.print_exc()
         return jsonify({'error': f'Internal Server Error: {str(e)}'}), 500
 
+
 # ==========================================
 # DELETE PRODUCT
 # ==========================================
 @app.delete('/api/admin/products/delete')
 @admin_required
 def delete_product():
-    data = request.get_json() or {}
-    product_id = data.get('product_id')
+    try:
+        data = request.get_json() or {}
+        product_id = data.get('product_id')
 
-    if not product_id:
-        return jsonify({'error': 'Product ID is required'}), 400
+        if not product_id:
+            return jsonify({'error': 'Product ID is required'}), 400
 
-    product = Product.query.get(product_id)
-    if product is None:
-        return jsonify({'error': f'Product with ID {product_id} not found'}), 404
+        check_sql = text("SELECT id, image FROM product WHERE id = :id")
+        existing_product = db.session.execute(check_sql, {'id': product_id}).fetchone()
 
-    if product.image:
-        image_path = product.image.lstrip('/')
-        if os.path.exists(image_path):
+        if not existing_product:
+            return jsonify({'error': f'Product with ID {product_id} not found'}), 404
+
+        current_image = existing_product._mapping['image']
+
+        if current_image:
             try:
-                os.remove(image_path)
-            except OSError:
-                pass
+                image_path = current_image.lstrip('/')
+                if os.path.exists(image_path):
+                    os.remove(image_path)
+            except Exception as img_err:
+                print(f"Warning: Could not remove image file: {img_err}")
 
-    db.session.delete(product)
-    db.session.commit()
+        delete_sql = text("DELETE FROM product WHERE id = :id")
+        db.session.execute(delete_sql, {'id': product_id})
+        db.session.commit()
 
-    return jsonify({
-        'message': 'Product deleted successfully',
-        'product_id': product_id
-    }), 200
+        return jsonify({
+            'message': 'Product deleted successfully',
+            'product_id': product_id
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Internal Server Error: {str(e)}'}), 500
